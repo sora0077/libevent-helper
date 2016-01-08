@@ -1,0 +1,17 @@
+PODS:
+  - libevent (0.1.1)
+  - libevent-helper (0.1.0):
+    - libevent
+
+DEPENDENCIES:
+  - libevent-helper (from `../../libevent-helper.podspec`)
+
+EXTERNAL SOURCES:
+  libevent-helper:
+    :path: ../../libevent-helper.podspec
+
+SPEC CHECKSUMS:
+  libevent: d8d7c322f15b93a858b0a01ec11c54a26cd60d1e
+  libevent-helper: 2567ad1127cecb531d70ab4f5d1d48faf04f7d47
+
+COCOAPODS: 0.39.0
