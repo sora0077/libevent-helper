@@ -11,7 +11,11 @@ import libevent
 import libevent_helper
 
 let HTTPD_ADDR = "0.0.0.0"
-let HTTPD_PORT: UInt16 = 8080
+let HTTPD_PORT: UInt16 = 8081
+
+func empty<T>(count: Int, repeatedValue: T) -> [T] {
+    return Array<T>(count: count, repeatedValue: repeatedValue)
+}
 
 func req_handler(req: UnsafeMutablePointer<evhttp_request>, arg: UnsafeMutablePointer<Void>) {
     
@@ -21,8 +25,41 @@ func req_handler(req: UnsafeMutablePointer<evhttp_request>, arg: UnsafeMutablePo
         return
     }
     
+    let conn = evhttp_request_get_connection(req)
+    var address: UnsafeMutablePointer<Int8> = nil
+    var port: UInt16 = 0
+    evhttp_connection_get_peer(conn, &address, &port)
+    print(String.fromCString(address), port)
+    
+    let uri = evhttp_request_get_evhttp_uri(req)
+    print(String.fromCString(evhttp_uri_get_scheme(uri)))
+    print(String.fromCString(evhttp_request_get_host(req)))
+    print(req.memory.remote_port)
+    print(String.fromCString(req.memory.uri))
+    print(String.fromCString(req.memory.remote_host))
+    print(req.memory.response_code)
+    print(String.fromCString(evhttp_request_get_uri(req)))
+    
+    
+    
+    let method = Method(cmd: evhttp_request_get_command(req))
+    print(method)
+    
     let headers = http_request_get_input_headers(req)
-    print(headers)
+    for (k, v) in headers {
+        print(k, v)
+    }
+    
+    print("-----")
+    let input_buf = evhttp_request_get_input_buffer(req)
+    while evbuffer_get_length(input_buf) > 0 {
+        var copied = Array<CChar>(count: 128, repeatedValue: 0)
+        let n = evbuffer_remove(input_buf, &copied, 128)
+        if n > 0 {
+            fwrite(copied, 1, Int(n), stdout)
+        }
+    }
+    print("-----")
     
     let message = "Hello world😀"
     evhttp_add_header(req.memory.output_headers, "Content-Type", "text/plain")
